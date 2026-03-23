@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
-interface Profile {
+export interface Profile {
   id: string
   username: string
   display_name: string | null
   weather_city: string
   weather_lat: number
   weather_lon: number
+  role: 'user' | 'admin'
+  is_approved: boolean
 }
 
 export function useAuth() {
@@ -17,14 +19,12 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 현재 세션 확인
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       if (session?.user) fetchProfile(session.user.id)
       else setLoading(false)
     })
 
-    // 세션 변경 감지 (로그인/로그아웃)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) fetchProfile(session.user.id)

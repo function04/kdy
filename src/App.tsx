@@ -8,8 +8,26 @@ import { SchedulePage } from '@/components/schedule/SchedulePage'
 import { AnalyticsPage } from '@/components/analytics/AnalyticsPage'
 import { SettingsPage } from '@/components/settings/SettingsPage'
 
+function PendingPage({ onSignOut }: { onSignOut: () => void }) {
+  return (
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+      <div className="text-5xl mb-4">⏳</div>
+      <h2 className="text-xl font-bold text-slate-100 mb-2">승인 대기 중</h2>
+      <p className="text-muted text-sm mb-8">
+        관리자가 계정을 승인하면 이용 가능합니다.
+      </p>
+      <button
+        onClick={onSignOut}
+        className="text-muted text-sm underline"
+      >
+        로그아웃
+      </button>
+    </div>
+  )
+}
+
 function AppRoutes() {
-  const { user, loading } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
 
   if (loading) {
     return (
@@ -19,8 +37,10 @@ function AppRoutes() {
     )
   }
 
-  if (!user) {
-    return <LoginPage />
+  if (!user) return <LoginPage />
+
+  if (profile && !profile.is_approved) {
+    return <PendingPage onSignOut={signOut} />
   }
 
   return (
