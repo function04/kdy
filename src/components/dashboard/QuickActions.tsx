@@ -39,7 +39,6 @@ export function QuickActions() {
                 borderColor: isActive ? config.color : `${config.color}30`,
               }}
             >
-              <span className="text-xl">{config.icon}</span>
               <span className="text-xs text-slate-300">{config.label}</span>
             </button>
           )

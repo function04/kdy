@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { SplashScreen } from '@/components/SplashScreen'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { PullToRefresh } from '@/components/layout/PullToRefresh'
+import { UpdateBanner } from '@/components/layout/UpdateBanner'
 import { ActivityPanel } from '@/components/activity/ActivityPanel'
 import { LoginPage } from '@/components/auth/LoginPage'
 import { DashboardPage } from '@/components/dashboard/DashboardPage'
@@ -200,6 +201,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
+      <UpdateBanner />
       {splash && <SplashScreen onDone={() => setSplash(false)} />}
       {!splash && (
         <BrowserRouter>

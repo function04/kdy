@@ -38,7 +38,7 @@ export function TodaySummary({ activities }: TodaySummaryProps) {
               className="rounded-xl p-3"
               style={{ backgroundColor: `${config.color}12` }}
             >
-              <p className="text-xs text-muted mb-1">{config.icon} {label}</p>
+              <p className="text-xs text-muted mb-1">{label}</p>
               <p className="text-slate-100 font-semibold text-sm">
                 {value ?? <span className="text-muted font-normal">-</span>}
               </p>

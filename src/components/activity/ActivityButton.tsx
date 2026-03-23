@@ -24,7 +24,6 @@ export function ActivityButton({ type, onPress, disabled }: ActivityButtonProps)
         borderColor: isActive ? config.color : `${config.color}40`,
       }}
     >
-      <span className="text-3xl mb-2">{config.icon}</span>
       <span className="font-semibold text-slate-100 text-sm">{config.label}</span>
       {isActive && (
         <span className="text-xs mt-1" style={{ color: config.color }}>진행 중</span>
