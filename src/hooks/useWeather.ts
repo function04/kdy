@@ -55,6 +55,8 @@ export function useWeather(lat: number, lon: number) {
         const hourlyTimes: string[] = data.hourly.time
         const todayPrefix = now.toISOString().slice(0, 10)
 
+        // 오늘 현재 시각부터 내일 자정(24시간)까지
+        const tomorrowPrefix = new Date(now.getTime() + 86400000).toISOString().slice(0, 10)
         const hourly = hourlyTimes
           .map((t, i) => ({
             time: t,
@@ -63,11 +65,15 @@ export function useWeather(lat: number, lon: number) {
             precipProb: data.hourly.precipitation_probability[i],
           }))
           .filter((h) => {
-            if (!h.time.startsWith(todayPrefix)) return false
-            const hour = parseInt(h.time.slice(11, 13))
-            return hour >= currentHour && hour <= currentHour + 11
+            const datePrefix = h.time.slice(0, 10)
+            if (datePrefix === todayPrefix) {
+              return parseInt(h.time.slice(11, 13)) >= currentHour
+            }
+            if (datePrefix === tomorrowPrefix) {
+              return parseInt(h.time.slice(11, 13)) <= 23
+            }
+            return false
           })
-          .slice(0, 12)
 
         const forecast: ForecastDay[] = data.daily.time.slice(1, 4).map((date: string, i: number) => ({
           date,

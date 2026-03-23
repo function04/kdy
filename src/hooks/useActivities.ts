@@ -43,38 +43,45 @@ export function useActivities() {
     fetchToday()
   }, [fetchToday])
 
-  // 기상: 진행 중인 취침 종료 + 기상 시작(타이머)
-  // 취침: 진행 중인 기상 종료 + 취침 시작(타이머)
+  // 기상: 취침 활동 종료만 (새 활동 시작 안 함)
+  // 취침: 취침 활동 시작 (타이머)
   async function logInstant(type: 'wake' | 'sleep') {
     const now = new Date().toISOString()
-    const user_id = await getCurrentUserId()
     const { activeActivityId, activeActivityType } = useAppStore.getState()
 
-    // 진행 중인 반대 활동 종료
-    const opposite = type === 'wake' ? 'sleep' : 'wake'
-    if (activeActivityId && activeActivityType === opposite) {
-      await supabase.from('activities').update({ ended_at: now }).eq('id', activeActivityId)
-      showFlash(`${type === 'wake' ? '취침 종료' : '기상 종료'}`)
+    if (type === 'wake') {
+      // 기상 = 취침 종료만
+      if (activeActivityId && activeActivityType === 'sleep') {
+        const { data, error } = await supabase
+          .from('activities')
+          .update({ ended_at: now })
+          .eq('id', activeActivityId)
+          .select()
+          .single()
+        if (!error && data) {
+          setActivities(prev => prev.map(a => a.id === activeActivityId ? { ...a, ended_at: now } : a))
+          clearActiveActivity()
+          showFlash('취침 종료')
+        }
+        return { error: error ?? null }
+      }
+      return { error: null }
     }
 
-    // 새 활동 시작 (ended_at 없음 = 진행 중)
+    // 취침 시작
+    const user_id = await getCurrentUserId()
     const { data, error } = await supabase
       .from('activities')
-      .insert({ type, started_at: now, user_id })
+      .insert({ type: 'sleep', started_at: now, user_id })
       .select()
       .single()
 
     if (!error && data) {
-      setActivities((prev) => {
-        // 진행 중이던 반대 활동도 ended_at 업데이트
-        return [data, ...prev.map(a =>
-          a.id === activeActivityId ? { ...a, ended_at: now } : a
-        )]
-      })
+      setActivities(prev => [data, ...prev])
       setActiveActivity(data.id, data.type, data.started_at)
-      showFlash(`${type === 'wake' ? '기상' : '취침'} 시작`)
+      showFlash('취침 시작')
     }
-    return { error }
+    return { error: error ?? null }
   }
 
   // 공부/운동: 시작

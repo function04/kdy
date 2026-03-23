@@ -105,21 +105,38 @@ export function WeatherWidget({ lat, lon, city }: WeatherWidgetProps) {
               {weather.hourly.length > 0 && (
                 <div className="border-t border-border px-2 py-3">
                   <div className="flex gap-1 overflow-x-auto pb-1">
-                    {weather.hourly.map((h) => {
-                      const info = getWeatherInfo(h.code)
-                      const hour = parseInt(h.time.slice(11, 13))
-                      const label = hour === 0 ? '자정' : hour === 12 ? '정오' : `${hour}시`
-                      return (
-                        <div key={h.time} className="flex flex-col items-center gap-1 min-w-[44px] px-1">
-                          <span className="text-muted text-[10px]">{label}</span>
-                          <span className="text-sm">{info.icon}</span>
-                          <span className="text-slate-200 text-xs font-medium">{h.temp}°</span>
-                          {h.precipProb > 0 && (
-                            <span className="text-blue-400 text-[10px]">{h.precipProb}%</span>
-                          )}
-                        </div>
-                      )
-                    })}
+                    {(() => {
+                      const today = new Date().toISOString().slice(0, 10)
+                      let shownTomorrow = false
+                      return weather.hourly.map((h) => {
+                        const info = getWeatherInfo(h.code)
+                        const hour = parseInt(h.time.slice(11, 13))
+                        const dateStr = h.time.slice(0, 10)
+                        const isTomorrow = dateStr !== today
+                        const showDivider = isTomorrow && !shownTomorrow
+                        if (showDivider) shownTomorrow = true
+                        const label = hour === 0 ? '자정' : hour === 12 ? '정오' : `${hour}시`
+                        return (
+                          <div key={h.time} className="flex items-start gap-0.5 flex-shrink-0">
+                            {showDivider && (
+                              <div className="flex flex-col items-center self-stretch mr-1">
+                                <div className="w-px flex-1 bg-border/60" />
+                                <span className="text-[9px] text-muted/70 rotate-90 origin-center my-1 whitespace-nowrap">내일</span>
+                                <div className="w-px flex-1 bg-border/60" />
+                              </div>
+                            )}
+                            <div className="flex flex-col items-center gap-1 min-w-[42px] px-1">
+                              <span className="text-muted text-[10px]">{label}</span>
+                              <span className="text-sm">{info.icon}</span>
+                              <span className="text-slate-200 text-xs font-medium">{h.temp}°</span>
+                              {h.precipProb > 0 && (
+                                <span className="text-blue-400 text-[10px]">{h.precipProb}%</span>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })
+                    })()}
                   </div>
                 </div>
               )}

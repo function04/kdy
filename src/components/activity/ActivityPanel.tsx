@@ -204,7 +204,9 @@ export function ActivityPanel() {
                       border: `1.5px solid ${isActive ? config.color : `${config.color}55`}`,
                     }}
                   >
-                    <span className="text-[11px] font-medium text-slate-100">{config.label}</span>
+                    <span className="text-[11px] font-medium text-slate-100">
+                      {type === 'wake' ? '기상 (취침종료)' : isActive ? `${config.label} 종료` : config.label}
+                    </span>
                   </button>
                 )
               })}
