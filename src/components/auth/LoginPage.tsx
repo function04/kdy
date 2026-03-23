@@ -9,7 +9,7 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const email = `${username}@app.local`
+  const email = `${username}@dashboard.dev`
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
