@@ -1,11 +1,24 @@
-import { useRegisterSW } from 'virtual:pwa-register/react'
+import { useState, useEffect } from 'react'
 import { Portal } from '@/lib/portal'
 
 export function UpdateBanner() {
-  const {
-    needRefresh: [needRefresh],
-    updateServiceWorker,
-  } = useRegisterSW()
+  const [needRefresh, setNeedRefresh] = useState(false)
+
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+
+    navigator.serviceWorker.ready.then((reg) => {
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing
+        if (!newWorker) return
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            setNeedRefresh(true)
+          }
+        })
+      })
+    })
+  }, [])
 
   if (!needRefresh) return null
 
@@ -23,7 +36,7 @@ export function UpdateBanner() {
         }}
       >
         <button
-          onClick={() => updateServiceWorker(true)}
+          onClick={() => window.location.reload()}
           style={{
             display: 'flex',
             alignItems: 'center',
