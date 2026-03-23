@@ -27,10 +27,7 @@ export function AdminPage({ onBack }: AdminPageProps) {
   }, [])
 
   async function fetchUsers() {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false })
+    const { data } = await supabase.rpc('get_all_profiles')
     if (data) setUsers(data)
     setLoading(false)
   }

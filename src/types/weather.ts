@@ -21,6 +21,8 @@ export interface WeatherData {
   todayMax: number
   todayMin: number
   todayPrecipProb: number
+  sunrise: string
+  sunset: string
   hourly: HourlyWeather[]
   forecast: ForecastDay[]
 }

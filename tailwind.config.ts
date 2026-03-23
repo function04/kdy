@@ -9,15 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#0F172A',
-        card: '#1E293B',
-        border: '#334155',
-        muted: '#475569',
+        background: 'var(--color-background)',
+        card: 'var(--color-card)',
+        border: 'var(--color-border)',
+        muted: 'var(--color-muted)',
+        primary: 'var(--color-text)',
+        secondary: 'var(--color-text-sub)',
         activity: {
-          wake: '#EAB308',    // 기상 - 노란
-          sleep: '#A855F7',   // 취침 - 보라
-          study: '#3B82F6',   // 공부 - 파랑
-          exercise: '#22C55E',// 운동 - 초록
+          wake: '#EAB308',
+          sleep: '#A855F7',
+          study: '#3B82F6',
+          exercise: '#22C55E',
         },
       },
       borderRadius: {

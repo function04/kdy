@@ -1,13 +1,25 @@
 <!doctype html>
-<html lang="ko" class="dark">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#0F172A" />
+    <meta name="theme-color" content="#1C1C1E" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>내 대시보드</title>
+    <!-- 테마 깜빡임 방지: 렌더 전에 클래스 적용 -->
+    <script>
+      (function() {
+        var saved = localStorage.getItem('theme') || 'dark';
+        if (saved === 'system') {
+          saved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        if (saved === 'light') {
+          document.documentElement.classList.add('theme-light');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

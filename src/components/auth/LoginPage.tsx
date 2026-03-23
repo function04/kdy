@@ -15,10 +15,8 @@ export function LoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-
     try {
       if (mode === 'signup') {
-        // 1. Auth 회원가입
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -26,8 +24,6 @@ export function LoginPage() {
         })
         if (signUpError) throw signUpError
         if (!data.user) throw new Error('회원가입 실패')
-
-        // 2. profiles 삽입
         const { error: profileError } = await supabase.from('profiles').insert({
           id: data.user.id,
           username,
@@ -50,24 +46,15 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-sm">
-        {/* 로고 */}
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-2">📊</div>
-          <h1 className="text-2xl font-bold text-slate-100">내 대시보드</h1>
-          <p className="text-muted text-sm mt-1">일상을 한눈에 관리하세요</p>
-        </div>
-
+      <div className="w-full max-w-sm space-y-5">
         {/* 탭 */}
-        <div className="flex bg-card rounded-xl p-1 mb-6 border border-border">
+        <div className="flex bg-card rounded-xl p-1 border border-border">
           {(['login', 'signup'] as const).map((m) => (
             <button
               key={m}
               onClick={() => { setMode(m); setError('') }}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                mode === m
-                  ? 'bg-blue-600 text-white'
-                  : 'text-muted hover:text-slate-300'
+                mode === m ? 'bg-blue-600 text-white' : 'text-muted'
               }`}
             >
               {m === 'login' ? '로그인' : '회원가입'}
@@ -78,42 +65,34 @@ export function LoginPage() {
         {/* 폼 */}
         <form onSubmit={handleSubmit} className="space-y-3">
           {mode === 'signup' && (
-            <div>
-              <label className="text-sm text-muted block mb-1">표시 이름</label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="앱에서 표시될 이름"
-                className="w-full bg-card border border-border rounded-xl px-4 py-3 text-slate-100 placeholder:text-muted focus:outline-none focus:border-blue-500 transition-colors"
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="text-sm text-muted block mb-1">아이디</label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
-              placeholder="영문/숫자"
-              required
-              className="w-full bg-card border border-border rounded-xl px-4 py-3 text-slate-100 placeholder:text-muted focus:outline-none focus:border-blue-500 transition-colors"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="표시 이름"
+              className="w-full bg-card border border-border rounded-xl px-4 py-3 placeholder:text-muted focus:outline-none focus:border-blue-500 transition-colors"
+              style={{ color: 'var(--color-text)' }}
             />
-          </div>
-
-          <div>
-            <label className="text-sm text-muted block mb-1">비밀번호</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="6자 이상"
-              required
-              minLength={6}
-              className="w-full bg-card border border-border rounded-xl px-4 py-3 text-slate-100 placeholder:text-muted focus:outline-none focus:border-blue-500 transition-colors"
-            />
-          </div>
+          )}
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
+            placeholder="아이디"
+            required
+            className="w-full bg-card border border-border rounded-xl px-4 py-3 placeholder:text-muted focus:outline-none focus:border-blue-500 transition-colors"
+            style={{ color: 'var(--color-text)' }}
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="비밀번호"
+            required
+            minLength={6}
+            className="w-full bg-card border border-border rounded-xl px-4 py-3 placeholder:text-muted focus:outline-none focus:border-blue-500 transition-colors"
+            style={{ color: 'var(--color-text)' }}
+          />
 
           {error && (
             <p className="text-red-400 text-sm text-center bg-red-400/10 rounded-lg py-2 px-3">
@@ -124,7 +103,7 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors mt-2"
+            className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors"
           >
             {loading ? '처리 중...' : mode === 'login' ? '로그인' : '회원가입'}
           </button>

@@ -11,12 +11,32 @@ export interface DaySummary {
   sleepTime: string | null
 }
 
+function buildSummaries(data: Activity[], days: number): DaySummary[] {
+  const grouped: Record<string, Activity[]> = {}
+  for (let i = days - 1; i >= 0; i--) {
+    const d = format(subDays(new Date(), i), 'yyyy-MM-dd')
+    grouped[d] = []
+  }
+  data.forEach((a) => {
+    const d = format(new Date(a.started_at), 'yyyy-MM-dd')
+    if (grouped[d]) grouped[d].push(a)
+  })
+  return Object.entries(grouped).map(([date, acts]) => ({
+    date,
+    studyMinutes: acts.filter((a) => a.type === 'study' && a.duration_minutes).reduce((s, a) => s + (a.duration_minutes ?? 0), 0),
+    exerciseMinutes: acts.filter((a) => a.type === 'exercise' && a.duration_minutes).reduce((s, a) => s + (a.duration_minutes ?? 0), 0),
+    wakeTime: acts.find((a) => a.type === 'wake')?.started_at ?? null,
+    sleepTime: acts.find((a) => a.type === 'sleep')?.started_at ?? null,
+  }))
+}
+
 export function useAnalytics() {
   const [weekly, setWeekly] = useState<DaySummary[]>([])
+  const [monthly, setMonthly] = useState<DaySummary[]>([])
   const [loading, setLoading] = useState(true)
 
-  const fetchWeekly = useCallback(async () => {
-    const from = startOfDay(subDays(new Date(), 6)).toISOString()
+  const fetch = useCallback(async () => {
+    const from = startOfDay(subDays(new Date(), 29)).toISOString()
     const { data } = await supabase
       .from('activities')
       .select('*')
@@ -25,36 +45,12 @@ export function useAnalytics() {
 
     if (!data) { setLoading(false); return }
 
-    // 날짜별 그룹화
-    const grouped: Record<string, Activity[]> = {}
-    for (let i = 6; i >= 0; i--) {
-      const d = format(subDays(new Date(), i), 'yyyy-MM-dd')
-      grouped[d] = []
-    }
-    data.forEach((a) => {
-      const d = format(new Date(a.started_at), 'yyyy-MM-dd')
-      if (grouped[d]) grouped[d].push(a)
-    })
-
-    const summaries: DaySummary[] = Object.entries(grouped).map(([date, acts]) => ({
-      date,
-      studyMinutes: acts
-        .filter((a) => a.type === 'study' && a.duration_minutes)
-        .reduce((sum, a) => sum + (a.duration_minutes ?? 0), 0),
-      exerciseMinutes: acts
-        .filter((a) => a.type === 'exercise' && a.duration_minutes)
-        .reduce((sum, a) => sum + (a.duration_minutes ?? 0), 0),
-      wakeTime: acts.find((a) => a.type === 'wake')?.started_at ?? null,
-      sleepTime: acts.find((a) => a.type === 'sleep')?.started_at ?? null,
-    }))
-
-    setWeekly(summaries)
+    setWeekly(buildSummaries(data.filter(a => new Date(a.started_at) >= startOfDay(subDays(new Date(), 6))), 7))
+    setMonthly(buildSummaries(data, 30))
     setLoading(false)
   }, [])
 
-  useEffect(() => {
-    fetchWeekly()
-  }, [fetchWeekly])
+  useEffect(() => { fetch() }, [fetch])
 
-  return { weekly, loading }
+  return { weekly, monthly, loading }
 }

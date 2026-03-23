@@ -2,6 +2,12 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Memo } from '@/types/memo'
 
+async function getCurrentUserId(): Promise<string> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('로그인이 필요합니다')
+  return user.id
+}
+
 export function useMemos() {
   const [memos, setMemos] = useState<Memo[]>([])
   const [loading, setLoading] = useState(true)
@@ -21,7 +27,8 @@ export function useMemos() {
   }, [fetchMemos])
 
   async function createMemo(memo: Omit<Memo, 'id' | 'user_id' | 'created_at'>) {
-    const { data, error } = await supabase.from('memos').insert(memo).select().single()
+    const user_id = await getCurrentUserId()
+    const { data, error } = await supabase.from('memos').insert({ ...memo, user_id }).select().single()
     if (!error && data) setMemos((prev) => [data, ...prev])
     return { error }
   }

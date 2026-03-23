@@ -10,9 +10,9 @@ export function PageShell({ children, className, noHeader }: PageShellProps) {
   return (
     <main
       className={cn(
-        'min-h-screen bg-background',
+        'min-h-full bg-background',
         !noHeader && 'pt-2',
-        'pb-20', // 하단 네비게이션 공간
+        'pb-24',
         className
       )}
     >

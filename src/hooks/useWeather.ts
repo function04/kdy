@@ -85,6 +85,8 @@ export function useWeather(lat: number, lon: number) {
           todayMax: Math.round(data.daily.temperature_2m_max[0]),
           todayMin: Math.round(data.daily.temperature_2m_min[0]),
           todayPrecipProb: data.daily.precipitation_probability_max[0],
+          sunrise: data.daily.sunrise[0].slice(11, 16),
+          sunset: data.daily.sunset[0].slice(11, 16),
           hourly,
           forecast,
         })

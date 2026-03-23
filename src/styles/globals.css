@@ -3,26 +3,72 @@
 @tailwind utilities;
 
 @layer base {
+  /* ── 다크 (기본) ── */
+  :root {
+    --color-background: #1C1C1E;
+    --color-card:       #2C2C2E;
+    --color-card2:      #3A3A3C;
+    --color-border:     #3A3A3C;
+    --color-muted:      #636366;
+    --color-text:       #F2F2F7;
+    --color-text-sub:   rgba(235,235,245,0.6);
+    --nav-bg:           28,28,30;
+    --nav-border:       255,255,255;
+    --nav-active:       0,122,255;
+  }
+
+  /* ── 라이트 (너무 밝지 않은 iOS 라이트) ── */
+  html.theme-light {
+    --color-background: #E8E8ED;
+    --color-card:       #F2F2F7;
+    --color-card2:      #E0E0E6;
+    --color-border:     #C7C7CC;
+    --color-muted:      #8E8E93;
+    --color-text:       #1C1C1E;
+    --color-text-sub:   rgba(60,60,67,0.6);
+    --nav-bg:           232,232,237;
+    --nav-border:       0,0,0;
+    --nav-active:       0,122,255;
+  }
+
   * {
-    @apply border-border;
     -webkit-tap-highlight-color: transparent;
   }
 
   html {
-    @apply bg-background text-slate-100;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
   }
 
   body {
-    @apply bg-background min-h-screen overflow-x-hidden;
+    background-color: var(--color-background);
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* 모바일 스크롤 부드럽게 */
+  /* 하드코딩 색상 → CSS 변수 */
+  .text-slate-100 { color: var(--color-text) !important; }
+  .text-slate-200 { color: var(--color-text) !important; }
+  .text-slate-300 { color: var(--color-text-sub) !important; }
+  .text-slate-400 { color: var(--color-muted) !important; }
+
+  .bg-card        { background-color: var(--color-card) !important; }
+  .bg-background  { background-color: var(--color-background) !important; }
+  .border-border  { border-color: var(--color-border) !important; }
+  .divide-border > * + * { border-color: var(--color-border) !important; }
+  .text-muted     { color: var(--color-muted) !important; }
+
+  /* 라이트에서 다크 전용 배경 클래스 오버라이드 */
+  html.theme-light .bg-orange-950\/40 { background-color: rgba(255,210,180,0.25) !important; }
+  html.theme-light .border-orange-800\/50 { border-color: rgba(234,88,12,0.3) !important; }
+  html.theme-light .bg-red-950\/40 { background-color: rgba(255,180,180,0.25) !important; }
+  html.theme-light .border-red-800\/50 { border-color: rgba(220,38,38,0.3) !important; }
+
   * {
     -webkit-overflow-scrolling: touch;
   }
 
-  /* 스크롤바 숨기기 (모바일 느낌) */
   ::-webkit-scrollbar {
     display: none;
   }
