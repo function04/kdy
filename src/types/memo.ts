@@ -7,5 +7,8 @@ export interface Memo {
   is_completed: boolean
   priority: 0 | 1 | 2
   color: string
+  actual_start: string | null
+  actual_end: string | null
+  duration_minutes: number | null
   created_at: string
 }

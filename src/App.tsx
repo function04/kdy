@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { GoogleCalendarProvider } from '@/contexts/GoogleCalendarContext'
 import { useAuth } from '@/hooks/useAuth'
 import { SplashScreen } from '@/components/SplashScreen'
 import { MobileNav } from '@/components/layout/MobileNav'
@@ -9,13 +10,12 @@ import { UpdateBanner } from '@/components/layout/UpdateBanner'
 import { ActivityPanel } from '@/components/activity/ActivityPanel'
 import { LoginPage } from '@/components/auth/LoginPage'
 import { DashboardPage } from '@/components/dashboard/DashboardPage'
-import { ActivityPage } from '@/components/activity/ActivityPage'
 import { SchedulePage, ScheduleFAB } from '@/components/schedule/SchedulePage'
 import { AnalyticsPage } from '@/components/analytics/AnalyticsPage'
 import { SettingsPage } from '@/components/settings/SettingsPage'
 
-const ROUTES = ['/', '/activity', '/schedule', '/analytics', '/settings']
-const PAGES = [DashboardPage, ActivityPage, SchedulePage, AnalyticsPage, SettingsPage]
+const ROUTES = ['/', '/schedule', '/analytics', '/settings']
+const PAGES = [DashboardPage, SchedulePage, AnalyticsPage, SettingsPage]
 
 function PendingPage({ onSignOut }: { onSignOut: () => void }) {
   return (
@@ -169,7 +169,7 @@ function SwipePages() {
 
       <MobileNav />
       <ActivityPanel />
-      <ScheduleFAB isVisible={idx === 2} />
+      <ScheduleFAB isVisible={idx === 1} />
     </div>
   )
 }
@@ -201,13 +201,15 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <UpdateBanner />
-      {splash && <SplashScreen onDone={() => setSplash(false)} />}
-      {!splash && (
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      )}
+      <GoogleCalendarProvider>
+        <UpdateBanner />
+        {splash && <SplashScreen onDone={() => setSplash(false)} />}
+        {!splash && (
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        )}
+      </GoogleCalendarProvider>
     </ThemeProvider>
   )
 }

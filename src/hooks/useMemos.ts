@@ -26,7 +26,7 @@ export function useMemos() {
     fetchMemos()
   }, [fetchMemos])
 
-  async function createMemo(memo: Omit<Memo, 'id' | 'user_id' | 'created_at'>) {
+  async function createMemo(memo: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes'>) {
     const user_id = await getCurrentUserId()
     const { data, error } = await supabase.from('memos').insert({ ...memo, user_id }).select().single()
     if (!error && data) setMemos((prev) => [data, ...prev])
@@ -49,5 +49,26 @@ export function useMemos() {
     return updateMemo(id, { is_completed: !current })
   }
 
-  return { memos, loading, createMemo, updateMemo, deleteMemo, toggleComplete, refetch: fetchMemos }
+  // 일정 시작 — actual_start 기록
+  async function startMemo(id: string) {
+    return updateMemo(id, { actual_start: new Date().toISOString() })
+  }
+
+  // 일정 완료 — actual_end + duration 계산 + is_completed
+  async function completeMemo(id: string) {
+    const memo = memos.find(m => m.id === id)
+    if (!memo) return { error: new Error('not found') }
+
+    const now = new Date()
+    const start = memo.actual_start ? new Date(memo.actual_start) : now
+    const duration = Math.round((now.getTime() - start.getTime()) / 60000)
+
+    return updateMemo(id, {
+      actual_end: now.toISOString(),
+      duration_minutes: duration,
+      is_completed: true,
+    })
+  }
+
+  return { memos, loading, createMemo, updateMemo, deleteMemo, toggleComplete, startMemo, completeMemo, refetch: fetchMemos }
 }

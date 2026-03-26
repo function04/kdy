@@ -1,5 +1,4 @@
 import { format } from 'date-fns'
-import { ko } from 'date-fns/locale'
 
 interface HeaderProps {
   displayName?: string
@@ -7,15 +6,15 @@ interface HeaderProps {
 
 function getGreeting() {
   const hour = new Date().getHours()
-  if (hour < 6)  return '깊은 밤이에요'
-  if (hour < 12) return '좋은 아침이에요'
-  if (hour < 18) return '좋은 오후예요'
-  if (hour < 22) return '좋은 저녁이에요'
-  return '편안한 밤이에요'
+  if (hour < 6)  return 'Good Night'
+  if (hour < 12) return 'Good Morning'
+  if (hour < 18) return 'Good Afternoon'
+  if (hour < 22) return 'Good Evening'
+  return 'Good Night'
 }
 
 export function Header({ displayName }: HeaderProps) {
-  const today = format(new Date(), 'M월 d일 (eee)', { locale: ko })
+  const today = format(new Date(), 'EEE, MMM d')
 
   return (
     <div className="px-4 pt-4 pb-2">

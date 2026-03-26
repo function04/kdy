@@ -31,7 +31,7 @@ export function useActivities() {
       // 진행 중인 활동 복원 (ended_at이 null인 것)
       const ongoing = data.find((a) => a.ended_at === null)
       if (ongoing) {
-        setActiveActivity(ongoing.id, ongoing.type, ongoing.started_at)
+        setActiveActivity(ongoing.id, ongoing.type, ongoing.started_at, ongoing.note ?? undefined)
       } else {
         clearActiveActivity()
       }
@@ -84,19 +84,21 @@ export function useActivities() {
     return { error: error ?? null }
   }
 
-  // 공부/운동: 시작
-  async function startActivity(type: 'study' | 'exercise') {
+  // 공부/운동: 시작 (커스텀 이름 가능)
+  async function startActivity(type: 'study' | 'exercise', note?: string) {
     const now = new Date().toISOString()
     const user_id = await getCurrentUserId()
+    const insert: any = { type, started_at: now, user_id }
+    if (note) insert.note = note
     const { data, error } = await supabase
       .from('activities')
-      .insert({ type, started_at: now, user_id })
+      .insert(insert)
       .select()
       .single()
     if (!error && data) {
       setActivities((prev) => [data, ...prev])
-      setActiveActivity(data.id, data.type, data.started_at)
-      showFlash(`${type === 'study' ? '공부' : '운동'} 시작`)
+      setActiveActivity(data.id, data.type, data.started_at, note)
+      showFlash(`${note || (type === 'study' ? '공부' : '운동')} 시작`)
     }
     return { error }
   }

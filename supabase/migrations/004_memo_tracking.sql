@@ -1,0 +1,4 @@
+-- 일정 실제 시작/종료 시간 + 소요시간 추적
+ALTER TABLE memos ADD COLUMN IF NOT EXISTS actual_start TIMESTAMPTZ;
+ALTER TABLE memos ADD COLUMN IF NOT EXISTS actual_end TIMESTAMPTZ;
+ALTER TABLE memos ADD COLUMN IF NOT EXISTS duration_minutes INTEGER;

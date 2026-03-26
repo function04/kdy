@@ -3,67 +3,105 @@
 @tailwind utilities;
 
 @layer base {
-  /* ── 다크 (기본) ── */
-  :root {
-    --color-background: #1C1C1E;
-    --color-card:       #2C2C2E;
-    --color-card2:      #3A3A3C;
-    --color-border:     #3A3A3C;
-    --color-muted:      #636366;
-    --color-text:       #F2F2F7;
-    --color-text-sub:   rgba(235,235,245,0.6);
-    --nav-bg:           28,28,30;
-    --nav-border:       255,255,255;
-    --nav-active:       0,122,255;
-  }
-
-  /* ── 라이트 (너무 밝지 않은 iOS 라이트) ── */
+  :root,
   html.theme-light {
-    --color-background: #E8E8ED;
-    --color-card:       #F2F2F7;
-    --color-card2:      #E0E0E6;
-    --color-border:     #C7C7CC;
-    --color-muted:      #8E8E93;
-    --color-text:       #1C1C1E;
-    --color-text-sub:   rgba(60,60,67,0.6);
-    --nav-bg:           232,232,237;
-    --nav-border:       0,0,0;
-    --nav-active:       0,122,255;
+    --color-background: #2c2c2e;
+    --color-card:       rgba(255, 255, 255, 0.07);
+    --color-card2:      rgba(255, 255, 255, 0.04);
+    --color-border:     rgba(255, 255, 255, 0.10);
+    --color-muted:      #8e8e93;
+    --color-text:       #f0f0f0;
+    --color-text-sub:   rgba(240, 240, 240, 0.55);
+    --color-accent:     #007aff;
+    --color-pink:       #e8446a;
+    --color-warning:    #ff9500;
+    --nav-bg:           44, 44, 46;
+    --nav-border:       255, 255, 255;
+    --nav-active:       0, 122, 255;
   }
 
   * {
     -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
   }
 
   html {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background-color: var(--color-background);
     color: var(--color-text);
+    background-color: #2c2c2e;
   }
 
   body {
-    background-color: var(--color-background);
-    min-height: 100vh;
+    background-color: transparent;
+    min-height: 100dvh;
     overflow-x: hidden;
   }
 
-  /* 하드코딩 색상 → CSS 변수 */
+  /* ── 배경 ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 10%, rgba(80, 80, 100, 0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 90%, rgba(60, 60, 80, 0.30) 0%, transparent 60%),
+      #2c2c2e;
+  }
+
+  /* ── 노이즈 텍스처 ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    background-size: 256px;
+  }
+
+  /* ── 색상 오버라이드 ── */
   .text-slate-100 { color: var(--color-text) !important; }
   .text-slate-200 { color: var(--color-text) !important; }
   .text-slate-300 { color: var(--color-text-sub) !important; }
   .text-slate-400 { color: var(--color-muted) !important; }
 
-  .bg-card        { background-color: var(--color-card) !important; }
-  .bg-background  { background-color: var(--color-background) !important; }
+  .bg-background  { background-color: transparent !important; }
   .border-border  { border-color: var(--color-border) !important; }
   .divide-border > * + * { border-color: var(--color-border) !important; }
   .text-muted     { color: var(--color-muted) !important; }
 
-  /* 라이트에서 다크 전용 배경 클래스 오버라이드 */
-  html.theme-light .bg-orange-950\/40 { background-color: rgba(255,210,180,0.25) !important; }
-  html.theme-light .border-orange-800\/50 { border-color: rgba(234,88,12,0.3) !important; }
-  html.theme-light .bg-red-950\/40 { background-color: rgba(255,180,180,0.25) !important; }
-  html.theme-light .border-red-800\/50 { border-color: rgba(220,38,38,0.3) !important; }
+  /* ── 유리 카드 ── */
+  .bg-card {
+    background: var(--color-card) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow:
+      0 2px 12px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    position: relative;
+  }
+
+  .bg-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.30), transparent);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* 다크 관련 오버라이드 제거 — 라이트 단일 테마 */
+  .bg-orange-950\/40 { background-color: rgba(255, 210, 180, 0.25) !important; }
+  .border-orange-800\/50 { border-color: rgba(234, 88, 12, 0.3) !important; }
+  .bg-red-950\/40 { background-color: rgba(255, 180, 180, 0.25) !important; }
+  .border-red-800\/50 { border-color: rgba(220, 38, 38, 0.3) !important; }
 
   * {
     -webkit-overflow-scrolling: touch;
@@ -81,4 +119,35 @@
   .safe-top {
     padding-top: env(safe-area-inset-top);
   }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  .glass-modal {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(60px) saturate(200%);
+    -webkit-backdrop-filter: blur(60px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+
+  .empty-float {
+    animation: emptyFloat 2.5s ease-in-out infinite;
+  }
+}
+
+/* ── 애니메이션 ── */
+@keyframes emptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes folderPopIn {
+  0%   { opacity: 0; transform: scale(0.88); }
+  100% { opacity: 1; transform: scale(1); }
 }
