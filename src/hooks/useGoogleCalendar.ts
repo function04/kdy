@@ -24,7 +24,6 @@ interface TokenResponse {
   error?: string
 }
 
-
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) { resolve(); return }
@@ -36,6 +35,27 @@ function loadScript(src: string): Promise<void> {
     s.onerror = reject
     document.head.appendChild(s)
   })
+}
+
+/** PWA standalone 모드인지 감지 */
+function isStandalone(): boolean {
+  return window.matchMedia('(display-mode: standalone)').matches
+    || (navigator as any).standalone === true
+}
+
+/** URL hash에서 OAuth implicit flow 토큰 파싱 */
+function parseTokenFromHash(): { access_token: string; expires_in: number } | null {
+  const hash = window.location.hash.substring(1)
+  if (!hash) return null
+  const params = new URLSearchParams(hash)
+  const token = params.get('access_token')
+  const expiresIn = params.get('expires_in')
+  if (token) {
+    // hash 정리
+    history.replaceState(null, '', window.location.pathname + window.location.search)
+    return { access_token: token, expires_in: Number(expiresIn) || 3600 }
+  }
+  return null
 }
 
 export function useGoogleCalendar() {
@@ -65,22 +85,38 @@ export function useGoogleCalendar() {
         })
       })
 
-      // Init GIS token client
-      tokenClientRef.current = (window as any).google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: (resp: TokenResponse) => {
-          if (resp.error) return
-          // 토큰 저장
-          const token = (window as any).gapi.client.getToken()
-          if (token) localStorage.setItem('gcal_token', JSON.stringify(token))
-          setIsSignedIn(true)
-          if (pendingActionRef.current) {
-            pendingActionRef.current()
-            pendingActionRef.current = null
-          }
-        },
-      })
+      // URL hash에서 토큰 복원 (OAuth implicit flow redirect 후)
+      const hashToken = parseTokenFromHash()
+      if (hashToken) {
+        const tokenObj = {
+          access_token: hashToken.access_token,
+          token_type: 'Bearer',
+          expires_in: hashToken.expires_in,
+        }
+        ;(window as any).gapi.client.setToken(tokenObj)
+        localStorage.setItem('gcal_token', JSON.stringify(tokenObj))
+        setIsSignedIn(true)
+        setReady(true)
+        return
+      }
+
+      // 브라우저 모드에서만 GIS token client 초기화 (standalone에서는 redirect 방식 사용)
+      if (!isStandalone()) {
+        tokenClientRef.current = (window as any).google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: (resp: TokenResponse) => {
+            if (resp.error) return
+            const token = (window as any).gapi.client.getToken()
+            if (token) localStorage.setItem('gcal_token', JSON.stringify(token))
+            setIsSignedIn(true)
+            if (pendingActionRef.current) {
+              pendingActionRef.current()
+              pendingActionRef.current = null
+            }
+          },
+        })
+      }
 
       // 저장된 토큰 복원
       const saved = localStorage.getItem('gcal_token')
@@ -99,7 +135,19 @@ export function useGoogleCalendar() {
   }, [])
 
   const signIn = useCallback(() => {
-    if (!tokenClientRef.current) return
+    // PWA standalone 모드: OAuth implicit flow redirect
+    if (isStandalone() || !tokenClientRef.current) {
+      const redirectUri = window.location.origin + window.location.pathname
+      const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
+        + `?client_id=${encodeURIComponent(CLIENT_ID)}`
+        + `&redirect_uri=${encodeURIComponent(redirectUri)}`
+        + `&response_type=token`
+        + `&scope=${encodeURIComponent(SCOPES)}`
+        + `&prompt=consent`
+      window.location.href = authUrl
+      return
+    }
+    // 일반 브라우저: 기존 팝업 방식
     const token = (window as any).gapi.client.getToken()
     if (!token) {
       tokenClientRef.current.requestAccessToken({ prompt: 'consent' })
