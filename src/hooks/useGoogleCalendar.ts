@@ -71,63 +71,77 @@ export function useGoogleCalendar() {
     if (!CLIENT_ID) return
 
     async function init() {
-      await Promise.all([
-        loadScript('https://apis.google.com/js/api.js'),
-        loadScript('https://accounts.google.com/gsi/client'),
-      ])
-
-      // Init GAPI
-      await new Promise<void>((resolve) => {
-        ;(window as any).gapi.load('client', async () => {
-          await (window as any).gapi.client.init({})
-          await (window as any).gapi.client.load(DISCOVERY_DOC)
-          resolve()
-        })
-      })
-
-      // URL hash에서 토큰 복원 (OAuth implicit flow redirect 후)
-      const hashToken = parseTokenFromHash()
-      if (hashToken) {
-        const tokenObj = {
-          access_token: hashToken.access_token,
-          token_type: 'Bearer',
-          expires_in: hashToken.expires_in,
-        }
-        ;(window as any).gapi.client.setToken(tokenObj)
-        localStorage.setItem('gcal_token', JSON.stringify(tokenObj))
-        setIsSignedIn(true)
-        setReady(true)
-        return
-      }
-
-      // 브라우저 모드에서만 GIS token client 초기화 (standalone에서는 redirect 방식 사용)
-      if (!isStandalone()) {
-        tokenClientRef.current = (window as any).google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: SCOPES,
-          callback: (resp: TokenResponse) => {
-            if (resp.error) return
-            const token = (window as any).gapi.client.getToken()
-            if (token) localStorage.setItem('gcal_token', JSON.stringify(token))
-            setIsSignedIn(true)
-            if (pendingActionRef.current) {
-              pendingActionRef.current()
-              pendingActionRef.current = null
-            }
-          },
-        })
-      }
-
-      // 저장된 토큰 복원
-      const saved = localStorage.getItem('gcal_token')
-      if (saved) {
-        try {
-          const token = JSON.parse(saved)
-          ;(window as any).gapi.client.setToken(token)
+      try {
+        // URL hash에서 토큰 복원 (OAuth implicit flow redirect 후)
+        const hashToken = parseTokenFromHash()
+        if (hashToken) {
+          // GAPI 로드 후 토큰 설정
+          await loadScript('https://apis.google.com/js/api.js')
+          await new Promise<void>((resolve) => {
+            ;(window as any).gapi.load('client', async () => {
+              await (window as any).gapi.client.init({})
+              await (window as any).gapi.client.load(DISCOVERY_DOC)
+              resolve()
+            })
+          })
+          const tokenObj = {
+            access_token: hashToken.access_token,
+            token_type: 'Bearer',
+            expires_in: hashToken.expires_in,
+          }
+          ;(window as any).gapi.client.setToken(tokenObj)
+          localStorage.setItem('gcal_token', JSON.stringify(tokenObj))
           setIsSignedIn(true)
-        } catch { localStorage.removeItem('gcal_token') }
+          setReady(true)
+          return
+        }
+
+        await Promise.all([
+          loadScript('https://apis.google.com/js/api.js'),
+          loadScript('https://accounts.google.com/gsi/client'),
+        ])
+
+        // Init GAPI
+        await new Promise<void>((resolve) => {
+          ;(window as any).gapi.load('client', async () => {
+            await (window as any).gapi.client.init({})
+            await (window as any).gapi.client.load(DISCOVERY_DOC)
+            resolve()
+          })
+        })
+
+        // 브라우저 모드에서만 GIS token client 초기화
+        if (!isStandalone()) {
+          tokenClientRef.current = (window as any).google.accounts.oauth2.initTokenClient({
+            client_id: CLIENT_ID,
+            scope: SCOPES,
+            callback: (resp: TokenResponse) => {
+              if (resp.error) return
+              const token = (window as any).gapi.client.getToken()
+              if (token) localStorage.setItem('gcal_token', JSON.stringify(token))
+              setIsSignedIn(true)
+              if (pendingActionRef.current) {
+                pendingActionRef.current()
+                pendingActionRef.current = null
+              }
+            },
+          })
+        }
+
+        // 저장된 토큰 복원
+        const saved = localStorage.getItem('gcal_token')
+        if (saved) {
+          try {
+            const token = JSON.parse(saved)
+            ;(window as any).gapi.client.setToken(token)
+            setIsSignedIn(true)
+          } catch { localStorage.removeItem('gcal_token') }
+        }
+      } catch (e) {
+        console.error('Google Calendar init error:', e)
       }
 
+      // 항상 ready 설정 — 실패해도 redirect 방식으로 signIn 가능
       setReady(true)
     }
 
