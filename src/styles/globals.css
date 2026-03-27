@@ -5,7 +5,7 @@
 @layer base {
   :root,
   html.theme-light {
-    --color-background: #2c2c2e;
+    --color-background: #1c1917;
     --color-card:       rgba(255, 255, 255, 0.07);
     --color-card2:      rgba(255, 255, 255, 0.04);
     --color-border:     rgba(255, 255, 255, 0.10);
@@ -15,7 +15,7 @@
     --color-accent:     #007aff;
     --color-pink:       #e8446a;
     --color-warning:    #ff9500;
-    --nav-bg:           44, 44, 46;
+    --nav-bg:           28, 25, 23;
     --nav-border:       255, 255, 255;
     --nav-active:       0, 122, 255;
   }
@@ -28,7 +28,7 @@
   html {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: var(--color-text);
-    background-color: #2c2c2e;
+    background-color: #1c1917;
   }
 
   body {
@@ -44,10 +44,7 @@
     inset: 0;
     z-index: -2;
     pointer-events: none;
-    background:
-      radial-gradient(ellipse 70% 50% at 10% 10%, rgba(80, 80, 100, 0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 90% 90%, rgba(60, 60, 80, 0.30) 0%, transparent 60%),
-      #2c2c2e;
+    background: #1c1917;
   }
 
   /* ── 노이즈 텍스처 ── */
