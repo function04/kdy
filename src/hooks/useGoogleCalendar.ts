@@ -24,8 +24,6 @@ interface TokenResponse {
   error?: string
 }
 
-let gapiLoaded = false
-let gisLoaded = false
 
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -63,7 +61,6 @@ export function useGoogleCalendar() {
         ;(window as any).gapi.load('client', async () => {
           await (window as any).gapi.client.init({})
           await (window as any).gapi.client.load(DISCOVERY_DOC)
-          gapiLoaded = true
           resolve()
         })
       })
@@ -84,7 +81,6 @@ export function useGoogleCalendar() {
           }
         },
       })
-      gisLoaded = true
 
       // 저장된 토큰 복원
       const saved = localStorage.getItem('gcal_token')

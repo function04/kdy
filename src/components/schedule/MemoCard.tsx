@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type { Memo } from '@/types/memo'
 import { formatTime } from '@/lib/utils'
 import { Trash2, Pencil, Check, CheckCircle } from 'lucide-react'

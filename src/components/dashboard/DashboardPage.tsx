@@ -13,7 +13,7 @@ import { isToday, differenceInDays, parseISO, format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { Plus, Trash2, X, Clock } from 'lucide-react'
 import { Portal } from '@/lib/portal'
-import { formatTime } from '@/lib/utils'
+
 import type { Memo } from '@/types/memo'
 
 function getDdayText(dateStr: string) {

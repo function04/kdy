@@ -32,7 +32,7 @@ export function ActivityPanel() {
       else await logInstant('sleep')
     } else {
       if (activeActivityType === type && activeActivityId) await stopActivity(activeActivityId)
-      else await startActivity(type)
+      else if (type === 'study' || type === 'exercise') await startActivity(type)
     }
     closePanel()
   }

@@ -80,7 +80,7 @@ export function SchedulePage() {
     return set
   }, [memos])
 
-  function handleSubmit(data: Omit<Memo, 'id' | 'user_id' | 'created_at'>) {
+  function handleSubmit(data: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes'>) {
     if (formState.editing) {
       updateMemo(formState.editing.id, data)
     } else {
