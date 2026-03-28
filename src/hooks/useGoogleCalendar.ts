@@ -151,7 +151,7 @@ export function useGoogleCalendar() {
   const signIn = useCallback(() => {
     // PWA standalone 모드: OAuth implicit flow redirect
     if (isStandalone() || !tokenClientRef.current) {
-      const redirectUri = window.location.origin + window.location.pathname
+      const redirectUri = window.location.origin + '/'
       const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
         + `?client_id=${encodeURIComponent(CLIENT_ID)}`
         + `&redirect_uri=${encodeURIComponent(redirectUri)}`
