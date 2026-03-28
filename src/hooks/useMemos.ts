@@ -26,7 +26,7 @@ export function useMemos() {
     fetchMemos()
   }, [fetchMemos])
 
-  async function createMemo(memo: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes'>) {
+  async function createMemo(memo: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes' | 'gcal_event_id'>) {
     const user_id = await getCurrentUserId()
     const { data, error } = await supabase.from('memos').insert({ ...memo, user_id }).select().single()
     if (!error && data) setMemos((prev) => [data, ...prev])
@@ -70,5 +70,9 @@ export function useMemos() {
     })
   }
 
-  return { memos, loading, createMemo, updateMemo, deleteMemo, toggleComplete, startMemo, completeMemo, refetch: fetchMemos }
+  async function saveGcalEventId(id: string, gcalEventId: string) {
+    return updateMemo(id, { gcal_event_id: gcalEventId } as Partial<Memo>)
+  }
+
+  return { memos, loading, createMemo, updateMemo, deleteMemo, toggleComplete, startMemo, completeMemo, saveGcalEventId, refetch: fetchMemos }
 }

@@ -162,7 +162,7 @@ function WeekStrip({ weekDays, selectedDate, datesWithMemos, onSelectDate, onSwi
 }
 
 function QuickAdd({ onAdd, onOpenForm }: {
-  onAdd: (data: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes'>) => void
+  onAdd: (data: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes' | 'gcal_event_id'>) => void
   onOpenForm: () => void
 }) {
   const [value, setValue] = useState('')
@@ -243,7 +243,7 @@ function QuickAdd({ onAdd, onOpenForm }: {
 }
 
 export function SchedulePage() {
-  const { memos, loading, createMemo, updateMemo, deleteMemo, toggleComplete } = useMemos()
+  const { memos, loading, createMemo, updateMemo, deleteMemo, toggleComplete, saveGcalEventId } = useMemos()
   const gcal = useGCal()
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [weekOffset, setWeekOffset] = useState(0)
@@ -288,14 +288,21 @@ export function SchedulePage() {
     return set
   }, [memos])
 
-  function handleSubmit(data: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes'>) {
+  function handleSubmit(data: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes' | 'gcal_event_id'>) {
     if (formState.editing) {
       updateMemo(formState.editing.id, data)
     } else {
-      createMemo(data)
-      if (gcal.isSignedIn && data.scheduled_at) {
-        gcal.ensureAuth(() => { gcal.createEvent(data.title, data.scheduled_at!) })
-      }
+      createMemo(data).then(res => {
+        if (!res.error && gcal.isSignedIn && data.scheduled_at) {
+          gcal.ensureAuth(async () => {
+            const event = await gcal.createEvent(data.title, data.scheduled_at!)
+            if (event?.id) {
+              const created = memos.find(m => m.title === data.title && !m.gcal_event_id)
+              if (created) saveGcalEventId(created.id, event.id)
+            }
+          })
+        }
+      })
     }
   }
 
@@ -381,10 +388,17 @@ export function SchedulePage() {
 
       {/* 빠른 추가 입력 */}
       <QuickAdd onAdd={(data) => {
-        createMemo(data)
-        if (gcal.isSignedIn && data.scheduled_at) {
-          gcal.ensureAuth(() => { gcal.createEvent(data.title, data.scheduled_at!) })
-        }
+        createMemo(data).then(res => {
+          if (!res.error && gcal.isSignedIn && data.scheduled_at) {
+            gcal.ensureAuth(async () => {
+              const event = await gcal.createEvent(data.title, data.scheduled_at!)
+              if (event?.id) {
+                const created = memos.find(m => m.title === data.title && !m.gcal_event_id)
+                if (created) saveGcalEventId(created.id, event.id)
+              }
+            })
+          }
+        })
       }} onOpenForm={() => setFormState({ show: true, editing: null })} />
 
       {/* Task 목록 */}
@@ -416,7 +430,12 @@ export function SchedulePage() {
                 memo={memo}
                 onToggle={() => toggleComplete(memo.id, memo.is_completed)}
                 onEdit={() => setFormState({ show: true, editing: memo })}
-                onDelete={() => deleteMemo(memo.id)}
+                onDelete={() => {
+                  if (memo.gcal_event_id && gcal.isSignedIn) {
+                    gcal.deleteEvent(memo.gcal_event_id).catch(() => {})
+                  }
+                  deleteMemo(memo.id)
+                }}
               />
             </div>
           ))

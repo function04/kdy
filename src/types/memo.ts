@@ -10,5 +10,6 @@ export interface Memo {
   actual_start: string | null
   actual_end: string | null
   duration_minutes: number | null
+  gcal_event_id: string | null
   created_at: string
 }

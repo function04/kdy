@@ -17,7 +17,7 @@ const PRIORITY_OPTIONS: { val: 0 | 1 | 2; label: string; color: string; activeBg
 
 interface MemoFormProps {
   initial?: Partial<Memo>
-  onSubmit: (data: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes'>) => void
+  onSubmit: (data: Omit<Memo, 'id' | 'user_id' | 'created_at' | 'actual_start' | 'actual_end' | 'duration_minutes' | 'gcal_event_id'>) => void
   onClose: () => void
 }
 
