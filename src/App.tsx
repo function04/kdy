@@ -7,7 +7,8 @@ import { SplashScreen } from '@/components/SplashScreen'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { PullToRefresh } from '@/components/layout/PullToRefresh'
 import { UpdateBanner } from '@/components/layout/UpdateBanner'
-import { ActivityPanel } from '@/components/activity/ActivityPanel'
+import { Toast } from '@/components/layout/Toast'
+// ActivityPanel removed — 활동 선택은 대시보드에서 직접 처리
 import { LoginPage } from '@/components/auth/LoginPage'
 import { DashboardPage } from '@/components/dashboard/DashboardPage'
 import { SchedulePage, ScheduleFAB } from '@/components/schedule/SchedulePage'
@@ -62,12 +63,18 @@ function SwipePages() {
     const track = trackRef.current
     if (!track) return
     track.style.transition = animated
-      ? 'transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+      ? 'transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)'
       : 'none'
     track.style.transform = `translateX(${x}px)`
   }
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
+    // data-no-swipe 속성이 있는 요소 안에서 시작된 터치는 페이지 스와이프 무시
+    const target = e.target as HTMLElement
+    if (target.closest('[data-no-swipe]')) {
+      touchStart.current = null
+      return
+    }
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
     dirLocked.current = null
     isDragging.current = false
@@ -168,8 +175,8 @@ function SwipePages() {
       </div>
 
       <MobileNav />
-      <ActivityPanel />
       <ScheduleFAB isVisible={idx === 1} />
+      <Toast />
     </div>
   )
 }

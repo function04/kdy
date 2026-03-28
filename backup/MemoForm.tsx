@@ -49,7 +49,7 @@ function getThisWeekDay(targetDay: number): Date {
   return d
 }
 
-export function parseNaturalInput(input: string): { title: string; scheduledAt: string } {
+function parseNaturalInput(input: string): { title: string; scheduledAt: string } {
   const now = new Date()
   let text = input.trim()
   let baseDate: Date | null = null

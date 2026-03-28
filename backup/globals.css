@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root,
+  html.theme-light {
+    --color-background: #111111;
+    --color-card:       #1c1c1e;
+    --color-card2:      #161618;
+    --color-border:     rgba(255, 255, 255, 0.10);
+    --color-muted:      #8e8e93;
+    --color-text:       #f0f0f0;
+    --color-text-sub:   rgba(240, 240, 240, 0.55);
+    --color-accent:     #007aff;
+    --color-pink:       #e8446a;
+    --color-warning:    #ff9500;
+    --nav-bg:           17, 17, 17;
+    --nav-border:       255, 255, 255;
+    --nav-active:       0, 122, 255;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--color-text);
+    background-color: #111111;
+  }
+
+  body {
+    background-color: transparent;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ── 배경 ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background: #111111;
+  }
+
+  /* ── 노이즈 텍스처 ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    background-size: 256px;
+  }
+
+  /* ── 색상 오버라이드 ── */
+  .text-slate-100 { color: var(--color-text) !important; }
+  .text-slate-200 { color: var(--color-text) !important; }
+  .text-slate-300 { color: var(--color-text-sub) !important; }
+  .text-slate-400 { color: var(--color-muted) !important; }
+
+  .bg-background  { background-color: transparent !important; }
+  .border-border  { border-color: var(--color-border) !important; }
+  .divide-border > * + * { border-color: var(--color-border) !important; }
+  .text-muted     { color: var(--color-muted) !important; }
+
+  /* ── Flat Dark 카드 ── */
+  .bg-card {
+    background: #1c1c1e !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    position: relative;
+  }
+
+  .bg-card::before {
+    display: none;
+  }
+
+  /* 다크 관련 오버라이드 제거 — 라이트 단일 테마 */
+  .bg-orange-950\/40 { background-color: rgba(255, 210, 180, 0.25) !important; }
+  .border-orange-800\/50 { border-color: rgba(234, 88, 12, 0.3) !important; }
+  .bg-red-950\/40 { background-color: rgba(255, 180, 180, 0.25) !important; }
+  .border-red-800\/50 { border-color: rgba(220, 38, 38, 0.3) !important; }
+
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  .glass-modal {
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(60px) saturate(200%);
+    -webkit-backdrop-filter: blur(60px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+
+  .empty-float {
+    animation: emptyFloat 2.5s ease-in-out infinite;
+  }
+}
+
+/* ── 애니메이션 ── */
+@keyframes emptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes folderPopIn {
+  0%   { opacity: 0; transform: scale(0.88); }
+  100% { opacity: 1; transform: scale(1); }
+}

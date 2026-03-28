@@ -46,78 +46,94 @@ export function SettingsPage() {
   return (
     <PageShell>
       <div className="px-4 pt-4 pb-2">
-        <h2 className="text-lg font-semibold text-slate-100">Settings</h2>
+        <h2 className="text-lg font-semibold text-[#EDEDEF]">Settings</h2>
       </div>
 
       <div className="px-4 space-y-4 pb-24">
-        {/* Profile */}
-        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-          <p className="text-sm font-medium text-slate-300">Profile</p>
-          <div>
-            <label className="text-xs text-muted block mb-1">Username</label>
-            <p className="text-slate-400 text-sm">{profile?.username}</p>
+        {/* Profile - iOS Grouped List 스타일 */}
+        <div>
+          <p className="text-[13px] font-medium text-[#A0A0A8] px-1 mb-2">Profile</p>
+          <div style={{ background: '#141416', borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+            {/* Username */}
+            <div className="px-4 py-3.5">
+              <label className="text-[12px] text-[#5C5C66] block mb-1">Username</label>
+              <p className="text-[#A0A0A8] text-[14px]">{profile?.username}</p>
+            </div>
+            <div className="ml-4" style={{ height: '0.5px', background: 'rgba(255,255,255,0.06)' }} />
+            {/* Display Name */}
+            <div className="px-4 py-3.5">
+              <label className="text-[12px] text-[#5C5C66] block mb-1.5">Display Name</label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="w-full rounded-xl px-3 py-2.5 text-[14px] focus:outline-none"
+                style={{ color: '#EDEDEF', background: '#0A0A0B', border: '1px solid rgba(255,255,255,0.08)' }}
+              />
+            </div>
+            <div className="ml-4" style={{ height: '0.5px', background: 'rgba(255,255,255,0.06)' }} />
+            {/* Save */}
+            <button
+              onClick={saveProfile}
+              disabled={saving}
+              className="w-full py-3 text-[14px] font-medium transition-colors disabled:opacity-40 pressable"
+              style={{ color: '#5B8DEF' }}
+            >
+              {saving ? 'Saving...' : 'Save'}
+            </button>
           </div>
-          <div>
-            <label className="text-xs text-muted block mb-1">Display Name</label>
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full bg-background border border-border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-              style={{ color: 'var(--color-text)' }}
-            />
-          </div>
-          <button
-            onClick={saveProfile}
-            disabled={saving}
-            className="w-full py-2.5 rounded-xl text-sm font-medium transition-colors"
-            style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', color: '#60A5FA' }}
-          >
-            {saving ? 'Saving...' : 'Save'}
-          </button>
         </div>
 
-        {/* Google Calendar */}
-        <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-          <p className="text-sm font-medium text-slate-300">Google Calendar</p>
-          {gcal.isSignedIn ? (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-400" />
-                <span className="text-green-400 text-sm">Connected</span>
-              </div>
-              <button onClick={() => gcal.signOut()} className="text-xs text-muted hover:text-red-400 transition-colors">
-                Disconnect
+        {/* Google Calendar - iOS Grouped List 스타일 */}
+        <div>
+          <p className="text-[13px] font-medium text-[#A0A0A8] px-1 mb-2">Google Calendar</p>
+          <div style={{ background: '#141416', borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+            {gcal.isSignedIn ? (
+              <>
+                <div className="px-4 py-3.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[#4ADE80]" />
+                    <span className="text-[#4ADE80] text-[14px]">Connected</span>
+                  </div>
+                  <button onClick={() => gcal.signOut()} className="text-[12px] text-[#5C5C66] active:text-[#F87171] transition-colors">
+                    Disconnect
+                  </button>
+                </div>
+                <div className="ml-4" style={{ height: '0.5px', background: 'rgba(255,255,255,0.06)' }} />
+                <button
+                  onClick={syncAllToGCal}
+                  disabled={syncing}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-[14px] font-medium text-[#A0A0A8] disabled:opacity-50 pressable"
+                >
+                  <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
+                  {syncing ? 'Syncing...' : 'Sync existing tasks'}
+                </button>
+                {syncResult && <p className="text-[#4ADE80] text-[12px] text-center pb-3">{syncResult}</p>}
+              </>
+            ) : (
+              <button
+                onClick={() => gcal.signIn()}
+                disabled={!gcal.ready}
+                className="w-full flex items-center justify-center gap-2 py-3.5 text-[14px] font-medium disabled:opacity-40 pressable"
+                style={{ color: '#5B8DEF' }}
+              >
+                <Calendar size={16} />
+                Connect Google Account
               </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => gcal.signIn()}
-              disabled={!gcal.ready}
-              className="w-full flex items-center justify-center gap-2 text-sm font-medium py-2.5 rounded-xl transition-colors"
-              style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', color: '#60A5FA' }}
-            >
-              <Calendar size={16} />
-              Connect Google Account
-            </button>
-          )}
-          {gcal.isSignedIn && (
-            <button
-              onClick={syncAllToGCal}
-              disabled={syncing}
-              className="w-full flex items-center justify-center gap-2 bg-white/5 border border-border text-slate-300 text-sm font-medium py-2.5 rounded-xl transition-colors hover:bg-white/10 disabled:opacity-50"
-            >
-              <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
-              {syncing ? 'Syncing...' : 'Sync existing tasks'}
-            </button>
-          )}
-          {syncResult && <p className="text-green-400 text-xs text-center">{syncResult}</p>}
+            )}
+          </div>
         </div>
 
         {/* Logout */}
         <button
           onClick={signOut}
-          className="w-full flex items-center justify-center gap-2 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400 font-medium py-3 rounded-2xl transition-colors"
+          className="w-full flex items-center justify-center gap-2 py-3.5 font-medium text-[14px] pressable"
+          style={{
+            background: 'rgba(248,113,113,0.08)',
+            border: '1px solid rgba(248,113,113,0.15)',
+            borderRadius: 16,
+            color: '#F87171',
+          }}
         >
           <LogOut size={18} />
           Logout

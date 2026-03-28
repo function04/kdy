@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { Memo } from '@/types/memo'
 import { formatTime } from '@/lib/utils'
-import { Trash2, Pencil, Check, CheckCircle } from 'lucide-react'
+import { Trash2, Pencil, Check, RotateCcw } from 'lucide-react'
 
 interface MemoCardProps {
   memo: Memo
@@ -13,21 +13,14 @@ interface MemoCardProps {
 const PRIORITY_LABEL = ['Low', 'Medium', 'High']
 
 const PRIORITY_COLOR: Record<number, string> = {
-  0: '#22C55E',
-  1: '#F59E0B',
-  2: '#EF4444',
+  0: '#4ADE80',
+  1: '#FBBF24',
+  2: '#F87171',
 }
 
-const PRIORITY_BADGE: Record<number, { bg: string; text: string }> = {
-  0: { bg: 'bg-green-500/10', text: 'text-green-400' },
-  1: { bg: 'bg-yellow-500/10', text: 'text-yellow-400' },
-  2: { bg: 'bg-red-500/10', text: 'text-red-400' },
-}
-
-const ACTION_WIDTH = 140
+const ACTION_WIDTH = 120
 
 export function MemoCard({ memo, onToggle, onEdit, onDelete }: MemoCardProps) {
-  const badge = PRIORITY_BADGE[memo.priority] ?? PRIORITY_BADGE[0]
   const color = PRIORITY_COLOR[memo.priority] ?? PRIORITY_COLOR[0]
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -40,7 +33,6 @@ export function MemoCard({ memo, onToggle, onEdit, onDelete }: MemoCardProps) {
   const offsetXRef = useRef(0)
   const [dismissed, setDismissed] = useState(false)
 
-  // native event listener로 등록해야 e.preventDefault() + stopPropagation 동시 가능
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -71,8 +63,6 @@ export function MemoCard({ memo, onToggle, onEdit, onDelete }: MemoCardProps) {
       }
 
       if (dirLocked.current !== 'h') return
-
-      // 페이지 스와이프 차단
       e.preventDefault()
       e.stopPropagation()
 
@@ -94,7 +84,7 @@ export function MemoCard({ memo, onToggle, onEdit, onDelete }: MemoCardProps) {
       dirLocked.current = null
 
       const val = offsetXRef.current
-      const finalX = val < -ACTION_WIDTH * 0.4 ? -ACTION_WIDTH : 0
+      const finalX = val < -ACTION_WIDTH * 0.35 ? -ACTION_WIDTH : 0
       offsetXRef.current = finalX
       setOffsetX(finalX)
     }
@@ -124,102 +114,85 @@ export function MemoCard({ memo, onToggle, onEdit, onDelete }: MemoCardProps) {
   }
 
   if (dismissed) {
-    return (
-      <div
-        className="transition-all duration-250"
-        style={{ maxHeight: 0, opacity: 0, marginBottom: 0 }}
-      />
-    )
+    return <div className="transition-all duration-250" style={{ maxHeight: 0, opacity: 0, marginBottom: 0 }} />
   }
 
   const isOpen = offsetX < -10
   const isSwiping = swipingRef.current
 
   return (
-    <div ref={containerRef} className="relative rounded-2xl" style={{ overflow: 'hidden' }}>
-      {/* 뒤쪽 액션 버튼 */}
-      {isOpen && (
-        <div
-          className="absolute right-0 top-0 bottom-0 flex items-stretch rounded-r-2xl"
-          style={{ width: ACTION_WIDTH, overflow: 'hidden' }}
+    <div ref={containerRef} className="relative" style={{ overflow: 'hidden', borderRadius: 14 }}>
+      {/* 뒤쪽 액션 — 아이콘만, 깔끔하게 */}
+      <div
+        className="absolute right-0 top-0 bottom-0 flex items-center justify-end gap-3 pr-4"
+        style={{ width: ACTION_WIDTH }}
+      >
+        <button
+          onClick={() => handleAction('complete')}
+          className="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+          style={{ background: memo.is_completed ? 'rgba(217,119,6,0.15)' : 'rgba(74,222,128,0.12)' }}
         >
-          <button
-            onClick={() => handleAction('complete')}
-            className="flex-1 flex flex-col items-center justify-center gap-1 active:opacity-80"
-            style={{ backgroundColor: memo.is_completed ? '#D97706' : '#16A34A' }}
-          >
-            <CheckCircle size={18} className="text-white" />
-            <span className="text-white text-[10px] font-medium">
-              {memo.is_completed ? 'Undo' : 'Done'}
-            </span>
-          </button>
-          <button
-            onClick={() => handleAction('delete')}
-            className="flex-1 flex flex-col items-center justify-center gap-1 active:opacity-80"
-            style={{ backgroundColor: '#DC2626' }}
-          >
-            <Trash2 size={18} className="text-white" />
-            <span className="text-white text-[10px] font-medium">Delete</span>
-          </button>
-        </div>
-      )}
+          {memo.is_completed
+            ? <RotateCcw size={16} style={{ color: '#FBBF24' }} />
+            : <Check size={16} style={{ color: '#4ADE80' }} strokeWidth={2.5} />
+          }
+        </button>
+        <button
+          onClick={() => handleAction('delete')}
+          className="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+          style={{ background: 'rgba(248,113,113,0.12)' }}
+        >
+          <Trash2 size={16} style={{ color: '#F87171' }} />
+        </button>
+      </div>
 
       {/* 메인 카드 */}
       <div
-        className={`relative bg-card rounded-2xl ${memo.is_completed ? 'opacity-40' : ''}`}
+        className={`relative ${memo.is_completed ? 'opacity-40' : ''}`}
         style={{
+          background: '#141416',
+          borderRadius: 14,
+          border: '1px solid rgba(255,255,255,0.06)',
           transform: `translateX(${offsetX}px)`,
           transition: isSwiping ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
           zIndex: 1,
         }}
         onClick={() => { if (isOpen) handleClose() }}
       >
-        <div className="flex items-stretch gap-0">
-          {/* 왼쪽 컬러 바 */}
-          <div
-            className="w-1 flex-shrink-0 rounded-l-2xl"
-            style={{ backgroundColor: color }}
-          />
+        <div className="flex items-center gap-3 px-4 py-3.5">
+          {/* 우선순위 컬러 도트 */}
+          <div className="w-[6px] h-[6px] rounded-full flex-shrink-0" style={{ backgroundColor: `${color}80` }} />
 
-          <div className="flex-1 flex items-center gap-3 px-3 py-3">
-            {/* 체크 버튼 */}
-            <button
-              onClick={(e) => { e.stopPropagation(); handleAction('complete') }}
-              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                memo.is_completed
-                  ? 'bg-blue-600 border-blue-600'
-                  : 'border-slate-500 active:border-blue-400'
-              }`}
-            >
-              {memo.is_completed && <Check size={11} className="text-white" strokeWidth={3} />}
-            </button>
-
-            {/* 내용 */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className={`text-slate-100 font-medium text-sm ${memo.is_completed ? 'line-through' : ''}`}>
-                  {memo.title}
-                </p>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${badge.bg} ${badge.text}`}>
-                  {PRIORITY_LABEL[memo.priority]}
-                </span>
-              </div>
+          {/* 내용 */}
+          <div className="flex-1 min-w-0">
+            <p className={`text-[14px] font-medium text-[#EDEDEF] truncate ${memo.is_completed ? 'line-through' : ''}`}>
+              {memo.title}
+            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[11px] font-medium" style={{ color: `${color}90` }}>
+                {PRIORITY_LABEL[memo.priority]}
+              </span>
               {memo.content && (
-                <p className="text-muted text-xs mt-0.5 line-clamp-1">{memo.content}</p>
-              )}
-              {memo.scheduled_at && (
-                <p className="text-muted text-xs mt-1">
-                  {formatTime(memo.scheduled_at)}
-                </p>
+                <>
+                  <span className="text-[#5C5C66]/30">·</span>
+                  <p className="text-[11px] text-[#5C5C66] truncate">{memo.content}</p>
+                </>
               )}
             </div>
+          </div>
 
-            {/* 수정 아이콘 */}
+          {/* 오른쪽: 시간 + 편집 */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {memo.scheduled_at && (
+              <span className="text-[12px] text-[#A0A0A8] font-mono tabular-nums">
+                {formatTime(memo.scheduled_at)}
+              </span>
+            )}
             <button
               onClick={(e) => { e.stopPropagation(); onEdit() }}
-              className="p-2 text-muted active:text-slate-200 rounded-xl transition-colors flex-shrink-0"
+              className="p-1.5 text-[#5C5C66] active:text-[#A0A0A8] transition-colors"
             >
-              <Pencil size={13} />
+              <Pencil size={12} />
             </button>
           </div>
         </div>

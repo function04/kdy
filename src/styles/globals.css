@@ -1,3 +1,5 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,19 +7,19 @@
 @layer base {
   :root,
   html.theme-light {
-    --color-background: #1c1917;
-    --color-card:       rgba(255, 255, 255, 0.07);
-    --color-card2:      rgba(255, 255, 255, 0.04);
-    --color-border:     rgba(255, 255, 255, 0.10);
-    --color-muted:      #8e8e93;
-    --color-text:       #f0f0f0;
-    --color-text-sub:   rgba(240, 240, 240, 0.55);
-    --color-accent:     #007aff;
+    --color-background: #0A0A0B;
+    --color-card:       #141416;
+    --color-card2:      #1C1C1F;
+    --color-border:     rgba(255, 255, 255, 0.06);
+    --color-muted:      #5C5C66;
+    --color-text:       #EDEDEF;
+    --color-text-sub:   #A0A0A8;
+    --color-accent:     #5B8DEF;
     --color-pink:       #e8446a;
-    --color-warning:    #ff9500;
-    --nav-bg:           28, 25, 23;
+    --color-warning:    #FBBF24;
+    --nav-bg:           10, 10, 11;
     --nav-border:       255, 255, 255;
-    --nav-active:       0, 122, 255;
+    --nav-active:       91, 141, 239;
   }
 
   * {
@@ -26,9 +28,9 @@
   }
 
   html {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: var(--color-text);
-    background-color: #1c1917;
+    background-color: #0A0A0B;
   }
 
   body {
@@ -44,7 +46,7 @@
     inset: 0;
     z-index: -2;
     pointer-events: none;
-    background: #1c1917;
+    background: #0A0A0B;
   }
 
   /* ── 노이즈 텍스처 ── */
@@ -70,31 +72,22 @@
   .divide-border > * + * { border-color: var(--color-border) !important; }
   .text-muted     { color: var(--color-muted) !important; }
 
-  /* ── 유리 카드 ── */
+  /* ── Flat Dark 카드 ── */
   .bg-card {
-    background: var(--color-card) !important;
+    background: #141416 !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow:
-      0 2px 12px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 16px !important;
+    box-shadow: none !important;
     position: relative;
   }
 
   .bg-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.30), transparent);
-    pointer-events: none;
-    border-radius: inherit;
+    display: none;
   }
 
-  /* 다크 관련 오버라이드 제거 — 라이트 단일 테마 */
+  /* 다크 관련 오버라이드 */
   .bg-orange-950\/40 { background-color: rgba(255, 210, 180, 0.25) !important; }
   .border-orange-800\/50 { border-color: rgba(234, 88, 12, 0.3) !important; }
   .bg-red-950\/40 { background-color: rgba(255, 180, 180, 0.25) !important; }
@@ -117,20 +110,81 @@
     padding-top: env(safe-area-inset-top);
   }
 
+  /* ── 글래스 (하단탭, 모달 등 유지) ── */
   .glass {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    box-shadow: 0 4px 30px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.25);
   }
 
   .glass-modal {
-    background: rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(60px) saturate(200%);
     -webkit-backdrop-filter: blur(60px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255,255,255,0.12);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.30);
+  }
+
+  /* ── 히어로 글래스 카드 (날씨, 주간요약 등 강조용) ── */
+  .card-glass {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  /* ── 모달 열림 시 상태바 어둡게 ── */
+  .modal-open {
+    --theme-color: #000000;
+  }
+
+  /* ── 터치 피드백 ── */
+  .pressable {
+    transition: transform 120ms ease, background 120ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pressable:active {
+    transform: scale(0.97);
+  }
+
+  /* ── 리스트 아이템 등장 애니메이션 ── */
+  .animate-in {
+    animation: fadeSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-in:nth-child(1) { animation-delay: 0ms; }
+  .animate-in:nth-child(2) { animation-delay: 40ms; }
+  .animate-in:nth-child(3) { animation-delay: 80ms; }
+  .animate-in:nth-child(4) { animation-delay: 120ms; }
+  .animate-in:nth-child(5) { animation-delay: 160ms; }
+
+  /* ── 스켈레톤 로딩 ── */
+  .skeleton {
+    background: linear-gradient(90deg, #141416 25%, #1C1C1F 50%, #141416 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: 8px;
+  }
+
+  /* ── 터치 리플 ── */
+  .ripple {
+    position: relative;
+    overflow: hidden;
+  }
+  .ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.08) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .ripple:active::after {
+    opacity: 1;
   }
 
   .empty-float {
@@ -147,4 +201,48 @@
 @keyframes folderPopIn {
   0%   { opacity: 0; transform: scale(0.88); }
   100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── 페이지 슬라이드 전환 ── */
+@keyframes pageSlideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes pageSlideOut {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+/* ── 햅틱 바운스 ── */
+@keyframes hapticBounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(0.82); }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.haptic {
+  animation: hapticBounce 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── 토스트 ── */
+@keyframes toastIn {
+  from { transform: translateY(100%) translateX(-50%); opacity: 0; }
+  to   { transform: translateY(0) translateX(-50%); opacity: 1; }
+}
+
+@keyframes toastOut {
+  from { transform: translateY(0) translateX(-50%); opacity: 1; }
+  to   { transform: translateY(100%) translateX(-50%); opacity: 0; }
 }
