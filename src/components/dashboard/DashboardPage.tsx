@@ -10,7 +10,6 @@ import { useCustomActivities } from '@/hooks/useCustomActivities'
 import { useAppStore } from '@/stores/appStore'
 import { ACTIVITY_CONFIG } from '@/lib/constants'
 import { isToday, differenceInDays, parseISO, format } from 'date-fns'
-import { ko } from 'date-fns/locale'
 import { Plus, Trash2, X } from 'lucide-react'
 import { Portal } from '@/lib/portal'
 import { useTodos } from '@/hooks/useTodos'
@@ -55,16 +54,21 @@ function TaskRow({ memo, onComplete, isLast }: { memo: Memo; onComplete: () => v
   const isActive = memo.actual_start && !memo.actual_end
   const now = new Date()
   const scheduled = memo.scheduled_at ? new Date(memo.scheduled_at) : null
-  const daysLeft = scheduled ? differenceInDays(scheduled, now) : null
+  // 날짜만 비교 (시간 무시)
+  const daysLeft = scheduled ? (() => {
+    const s = new Date(scheduled.getFullYear(), scheduled.getMonth(), scheduled.getDate())
+    const n = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    return Math.round((s.getTime() - n.getTime()) / (24 * 60 * 60 * 1000))
+  })() : null
 
   const scheduledTimeStr = scheduled
-    ? format(scheduled, 'a h:mm', { locale: ko })
+    ? format(scheduled, 'h:mm a')
     : ''
 
   const daysLeftText = daysLeft !== null
     ? daysLeft <= 0 ? 'Today'
     : daysLeft === 1 ? 'Tomorrow'
-    : `${daysLeft}일 남음`
+    : `${daysLeft} Days Left`
     : ''
 
   // 우선순위 색상
@@ -117,7 +121,7 @@ function TaskRow({ memo, onComplete, isLast }: { memo: Memo; onComplete: () => v
           <p className="text-[14px] font-medium text-[#EDEDEF] truncate">{memo.title}</p>
           <div className="flex items-center gap-1.5 mt-1">
             <span className="text-[12px] text-[#5C5C66]">{scheduledTimeStr}</span>
-            {isActive && <span className="text-[10px] text-[#5B8DEF]">진행 중</span>}
+            {isActive && <span className="text-[10px] text-[#5B8DEF]">In Progress</span>}
           </div>
         </div>
 
@@ -228,9 +232,9 @@ function ActivityTracker() {
           >
             <div className="flex items-center gap-3">
               <div className="w-[6px] h-[6px] rounded-full bg-[#5C5C66]/30" />
-              <span className="text-[13px] text-[#5C5C66]">활동 없음</span>
+              <span className="text-[13px] text-[#5C5C66]">No Activity</span>
             </div>
-            <span className="text-[11px] text-[#5C5C66]/50">탭하여 시작</span>
+            <span className="text-[11px] text-[#5C5C66]/50">Tap to start</span>
           </button>
         ) : (
           <div
@@ -250,7 +254,7 @@ function ActivityTracker() {
               </div>
               <div className="flex items-center gap-2">
                 <ElapsedTimer startTime={activeActivityStartedAt!} color={color} />
-                <span className="text-[10px] text-[#5C5C66]">더블탭 종료</span>
+                <span className="text-[10px] text-[#5C5C66]">Double tap to stop</span>
               </div>
             </div>
           </div>
@@ -354,7 +358,7 @@ function ActivityTracker() {
               }}
               onClick={e => e.stopPropagation()}
             >
-              <h3 className="text-[#EDEDEF] font-semibold text-[14px] mb-3">활동 추가</h3>
+              <h3 className="text-[#EDEDEF] font-semibold text-[14px] mb-3">Add Activity</h3>
               <form onSubmit={e => {
                 e.preventDefault()
                 if (!newActName.trim()) return
@@ -377,7 +381,7 @@ function ActivityTracker() {
                   className="w-full py-3 rounded-xl text-[14px] font-medium disabled:opacity-30"
                   style={{ background: '#5B8DEF', color: '#fff' }}
                 >
-                  추가
+                  Add
                 </button>
               </form>
             </div>
@@ -509,7 +513,7 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* ━━ 진행 중 활동 (Accent Bar) ━━ */}
+        {/* ━━ In Progress 활동 (Accent Bar) ━━ */}
         <ActivityTracker />
 
         {/* ━━ Recent Task (Grouped List, 최대 2개) ━━ */}
